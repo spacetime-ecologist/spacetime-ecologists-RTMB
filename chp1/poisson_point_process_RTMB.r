@@ -15,8 +15,8 @@ SD_logelev <- 0.5
 n_indiv <- 500
 
 get_elevation <- function(loc) { # simulation elevation
-    e0 <- dmvnorm(c(0, 0), mean = c(0, 0), sigma = SD_km^2 * diag(2))
-    peak_km * dmvnorm(loc, mean = c(0, 0), sigma = SD_km^2 * diag(2)) / e0
+    e0 <- mvtnorm::dmvnorm(c(0, 0), mean = c(0, 0), sigma = SD_km^2 * diag(2))
+    peak_km * mvtnorm::dmvnorm(loc, mean = c(0, 0), sigma = SD_km^2 * diag(2)) / e0
 }
 
 get_density <- function(loc) { # simulate density
@@ -42,7 +42,6 @@ simulate_location <- function(...) {
 }
 loc_i <- t(sapply(1:n_indiv, FUN = simulate_location))
 
-
 #--------------------------------------------------------------------------------
 # format data for glm
 #--------------------------------------------------------------------------------
@@ -67,9 +66,6 @@ data <- data.frame(st_coordinates(st_centroid(grid)),
 )
 
 data$elev <- get_elevation(data[, c("X", "Y")])
-
-# fit with glm()
-# fit <- glm(N ~ log(elev) + I(log(elev)^2), data = data, family = poisson)
 
 #--------------------------------------------------------------------------------
 # fit with RTMB
