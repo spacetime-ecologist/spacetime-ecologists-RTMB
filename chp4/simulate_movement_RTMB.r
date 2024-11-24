@@ -6,7 +6,7 @@ library(pracma)
 library(plotrix)
 library(stars)
 library(sem)
-source("shared_functions/build_ram.R") # --> needed for build_ram()
+source("shared_functions/build_ram.r") # --> needed for build_ram()
 
 #--------------------------------------------------------------------------------
 # create preference function, simulate the tracks w/taxis,
@@ -40,6 +40,7 @@ simulate_track <- function(n_t, beta_t, gamma_t, get_preference) {
 
 #--------------------------------------------------------------------------------
 # simulate a path
+#--------------------------------------------------------------------------------
 
 set.seed(4)
 x_iz <- simulate_track(
@@ -52,58 +53,13 @@ t_i <- c(0, cumsum(deltaT_i[-1]))
 
 #--------------------------------------------------------------------------------
 # set up covariance function
+#--------------------------------------------------------------------------------
 
-make_covar <- function(s2_z, RAM, RAMstart_z, nrows, ncols) {
-    I_rr <- diag(nrows)
-    if (nrow(RAM) > 0) { # structural equation covariance
-        Rho <- Gamma <- matrix(0, nrows, nrows)
-        for (zI in 1:nrow(RAM)) {
-            if (RAM[zI, 4] > 0) { # RAM(zI,3) in C++ becomes RAM[zI,4] in R (1-indexed)
-                if (RAM[zI, 1] == 1) {
-                    Rho[RAM[zI, 2], RAM[zI, 3]] <- s2_z[RAM[zI, 4]]
-                }
-                if (RAM[zI, 1] == 2) {
-                    Gamma[RAM[zI, 2], RAM[zI, 3]] <- s2_z[RAM[zI, 4]]
-                }
-            } else {
-                if (RAM[zI, 1] == 1) {
-                    Rho[RAM[zI, 2], RAM[zI, 3]] <- RAMstart_z[zI]
-                }
-                if (RAM[zI, 1] == 2) {
-                    Gamma[RAM[zI, 2], RAM[zI, 3]] <- RAMstart_z[zI]
-                }
-            }
-        }
-        L_rc <- I_rr - Rho
-        L_rc <- solve(L_rc)
-        L_rc <- L_rc %*% Gamma
-        Cov_rr <- L_rc %*% t(L_rc)
-    } else { # assemble loadings matrix covariance
-        L_rc <- matrix(0, nrows, ncols)
-        ctr <- 1
-        if (ncols > 0) {
-            for (i in 1:nrows) {
-                for (j in 1:ncols) {
-                    x_iz[i, ]
-                    if (i >= j) {
-                        L_rc[i, j] <- s2_z[ctr]
-                        ctr <- ctr + 1
-                    } else {
-                        L_rc[i, j] <- 0.0
-                    }
-                }
-            }
-        }
-        # diagonal and equal covariance matrix
-        Cov_rr <- I_rr * exp(s2_z[ctr])
-        # add factor-model covariance matrix
-        Cov_rr <- Cov_rr + L_rc %*% t(L_rc)
-    }
-    Cov_rr
-}
+source("shared_functions/make_covar.r")
 
 #--------------------------------------------------------------------------------
 # set up simplest model
+#--------------------------------------------------------------------------------
 
 set.seed(4)
 x_iz <- simulate_track(
@@ -172,8 +128,6 @@ f <- function(par) {
 }
 
 obj <- MakeADFun(f, par, random = "x_iz")
-obj$fn()
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # 313.7647 is book answer
 sdr <- sdreport(obj)
@@ -181,6 +135,7 @@ sdr
 
 #------------------------------------------------------------------------------
 # drift as a function of time
+#--------------------------------------------------------------------------------
 
 formula <- ~ splines::bs(t_i, 5)
 data$X_ij <- as.matrix(model.matrix(formula, data = data.frame("t_i" = t_i)))
@@ -188,8 +143,6 @@ par$beta_jz <- matrix(0, nrow = ncol(data$X_ij), ncol = 2)
 
 # Refit model
 obj <- MakeADFun(f, par, random = "x_iz")
-obj$fn()
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # 285.5892 is book answer
 sdr <- sdreport(obj)
@@ -197,6 +150,7 @@ sdr
 
 #------------------------------------------------------------------------------
 # Northern fur seal demo
+#--------------------------------------------------------------------------------
 
 DF <- read.csv("data/FSdata_2016.csv")
 DF <- st_as_sf(DF, coords = c("longitude", "latitude"), crs = "+proj=longlat")
@@ -232,17 +186,16 @@ data$y_iz[-which_include, ] <- NA
 
 # Refit model
 obj <- MakeADFun(f, par, random = "x_iz")
-obj$fn()
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # 133.0738 is book answer
 sdr <- sdreport(obj)
 sdr
 
 #------------------------------------------------------------------------------
-# Simulate multiple tracks
+# simulate multiple tracks
+#--------------------------------------------------------------------------------
 
-# Parameters
+# parameters
 gamma_t <- beta_t <- seq(0.5, -0.5, length = n_t)
 beta_t <- ifelse(beta_t > 0, 0, beta_t)
 gamma_t <- ifelse(gamma_t < 0, 0, gamma_t)
@@ -280,32 +233,30 @@ par <- list(
 which_include <- seq(1, nrow(data$y_iz), length = 20 * n_tracks)
 data$y_iz[-which_include, ] <- NA
 
-# Refit model
+# refit model
 obj <- MakeADFun(f, par, random = "x_iz")
-obj$fn()
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # 1860.966 is book answer
 sdr <- sdreport(obj)
 sdr
 
 #--------------------------------------------------------------------------------
-# Switch to factor model
+# switch to factor model
+#--------------------------------------------------------------------------------
 
 data$n_factors <- 2
 par$sigma2_z <- rep(0.1, 2 * ncol(y_iz))
 obj <- MakeADFun(f, par, random = "x_iz")
-obj$fn()
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # 1790.638 is book answer
 sdr <- sdreport(obj)
 sdr
 
 #--------------------------------------------------------------------------------
-# Structural equation model
+# structural equation model
+#--------------------------------------------------------------------------------
 
-# Specify SEM
+# specify SEM
 text <- "
   y1 -> y2, y
   y1 -> y3, y
@@ -320,15 +271,15 @@ SEM_model <- sem::specifyModel(
 )
 RAM <- build_ram(SEM_model, colnames(y_iz)) # uses Jim's helper
 
-# Build with RAM
+# build with RAM
 data$n_factors <- 0
 data$RAM <- as.matrix(RAM[, 1:4])
 data$RAM[data$RAM[, 1] == 2, 4] <- 2
 par$sigma2_z <- rep(0.1, max(data$RAM[, 4]))
+
 obj <- MakeADFun(f, par, random = "x_iz")
-obj$fn()
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # 1846.172 is book answer
 sdr <- sdreport(obj)
+sdr
 obj$report()$V_zz

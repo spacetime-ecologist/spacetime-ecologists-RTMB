@@ -1,7 +1,6 @@
 library(mvtnorm)
 library(stars)
 library(RTMB)
-source("shared_functions/add_legend.R")
 
 #--------------------------------------------------------------------------------
 # simulate data
@@ -87,8 +86,6 @@ f <- function(par) {
 }
 
 obj <- MakeADFun(f, par)
-obj$fn()
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # book solution 867.6721
 sdr <- sdreport(obj)

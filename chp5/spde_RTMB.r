@@ -2,7 +2,6 @@ library(sf)
 library(rnaturalearth)
 library(fmesher)
 library(RTMB)
-source("shared_functions/add_legend.R")
 
 #--------------------------------------------------------------------------------
 # read in data and manipulate for analysis
@@ -79,8 +78,6 @@ f <- function(par) {
 }
 
 obj <- MakeADFun(f, par, random = "omega_s")
-obj$fn()
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # book solution 196.619
 sdr <- sdreport(obj, bias.correct = TRUE)

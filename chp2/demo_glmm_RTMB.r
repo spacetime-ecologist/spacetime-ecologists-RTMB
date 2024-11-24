@@ -56,8 +56,6 @@ f <- function(par) {
 }
 
 obj <- MakeADFun(f, par, random = "eps_i")
-obj$fn()
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # book solution 63.20921
 

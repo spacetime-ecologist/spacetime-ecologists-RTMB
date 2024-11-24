@@ -118,10 +118,10 @@ f <- function(par) {
 }
 
 obj <- MakeADFun(f, par, random = "omega_s")
-obj$fn()
-obj$gr()
+
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # book solution is -1077.639
+
 sdr <- sdreport(obj,
     bias.correct = TRUE,
     getJointPrecision = TRUE,
