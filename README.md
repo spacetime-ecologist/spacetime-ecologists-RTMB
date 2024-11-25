@@ -9,7 +9,6 @@
 
 ## Chapter 7 
 
-    - `ICAR_covariate_simulation_RTMB.r` does not solve to same jnll as example in book, so may be a bug on my end
     - `Integrated_model.R` TMB model from book does not converge so not yet attempted in RTMB
 
 ## Chapter 9 

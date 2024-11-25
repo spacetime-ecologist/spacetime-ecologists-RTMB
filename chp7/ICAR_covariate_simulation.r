@@ -4,7 +4,8 @@ library(sf)
 library(Matrix)
 library(RTMB)
 # note: also requires 'igraph' package
-source("shared_functions/rmvnorm_prec.R")
+source("shared_functions/rmvnorm_prec.r")
+set.seed(1) # needed to match book solution, which otherwise is not reproducible
 
 #--------------------------------------------------------------------------------
 # read in data and manipulate for analysis
@@ -51,12 +52,11 @@ rho_max <- 1 / Re(igraph::arpack(f2,
     options = list(n = nrow(A_ss), nev = 3, ncv = 8, which = "LR")
 )$values[1])
 
-# Make ICAR precision
+# make ICAR precision
 rho <- rho_max * 0.75
 var_X1 <- 0.5^2
 var_X2 <- 0.5^2
 Q <- diag(rep(1, nrow(A_ss))) - rho * A_ss
-
 X1 <- rmvnorm_prec(mu = rep(0, nrow(A_ss)), prec = Q / var_X1, n.sims = 1)
 X2 <- rmvnorm_prec(mu = rep(0, nrow(A_ss)), prec = Q / var_X2, n.sims = 1)
 lambda_s <- exp(1 + X1 + X2)
@@ -71,6 +71,7 @@ X_sk <- model.matrix(formula, data.frame("X1" = X1, "X2" = X2))
 #--------------------------------------------------------------------------------
 # fit in RTMB
 #--------------------------------------------------------------------------------
+
 gamma_k <- ifelse(ncol(X_sk) == 0, numeric(1), numeric(ncol(X_sk)))
 par <- list(
     "beta0" = 0,
@@ -95,19 +96,16 @@ f <- function(par) {
     jnll <- 0
     Q_ss <- (I_ss - rho * A_ss) / exp(2 * log_sig) # note this is scaled
     jnll <- jnll - dgmrf(omega_s, 0.0, Q_ss, TRUE)
-
     # control situations when X_sk is NULL, which I think is automatically done in TMB:
     if (is.null(dim(X_sk))) {
         lambda_s <- exp(beta0 + omega_s)
     } else {
         lambda_s <- exp(beta0 + omega_s + X_sk * gamma_k)
     }
-
     # Pr(data|fixed and random coefficients):
     for (i in 1:length(c_i)) {
         jnll <- jnll - dpois(c_i[i], lambda_s[s_i[i]], TRUE)
     }
-
     sum_lambda <- sum(lambda_s)
     ADREPORT(sum_lambda)
     REPORT(rho)
@@ -123,8 +121,6 @@ obj$fn()
 
 obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # 650.2142 is book solution but I solve to 611.3939
-
+opt # --> 620.538 is book solution if set.seed(1)
 sdr <- sdreport(obj)
 sdr
-summary(sdr, "report")
