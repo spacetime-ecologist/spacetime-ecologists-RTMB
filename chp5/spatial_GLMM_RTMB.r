@@ -78,7 +78,6 @@ joint_dist_ll <- function(epsilon_xy, rho, sigma2, n_x, n_y) {
     Q_yy[cbind(1:(n_y - 1), 2:n_y)] <- -rho # upper diagonal
     Q_yy[cbind(2:n_y, 1:(n_y - 1))] <- -rho # lower diagonal
     # calculate probability
-    ans <- 0
     n_z <- n_x * n_y
     Q_zz <- kronecker(Q_yy, Q_xx)
     Q_zz <- Q_zz / sigma2
