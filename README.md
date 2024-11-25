@@ -5,16 +5,12 @@
 ## Chapter 5 
 
     - `spatial_GLMM_RTMB.r` 
-    - I have not yet figured out this example
+    - joint distribution (ctl = 2) version of this model hangs at `makeADFun()`
 
 ## Chapter 7 
 
     - `ICAR_covariate_simulation_RTMB.r` does not solve to same jnll as example in book, so may be a bug on my end
     - `Integrated_model.R` TMB model from book does not converge so not yet attempted in RTMB
-
-## Chapter 8 
-
-    - Not a problem, but seasonal_ozone_RTMB is much faster(?) than TMB version from book 
 
 ## Chapter 9 
 
