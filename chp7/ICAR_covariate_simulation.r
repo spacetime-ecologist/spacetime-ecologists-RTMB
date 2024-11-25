@@ -1,5 +1,3 @@
-#! WARNING DOES NOT YET MATCH OBJ FN VALUE FROM BOOK
-
 library(sf)
 library(Matrix)
 library(RTMB)
