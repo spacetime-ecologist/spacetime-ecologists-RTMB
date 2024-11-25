@@ -136,16 +136,17 @@ f <- function(par) {
         f1 <- function(x) {
             dautoreg(x,
                 mu = 0, phi = rho,
-                scale = sqrt(sig2) / sqrt(1 - rho^2), log = TRUE
+                log = TRUE
             )
         }
         f2 <- function(x) {
             dautoreg(x,
                 mu = 0, phi = rho,
-                scale = sqrt(sig2) / sqrt(1 - rho^2), log = TRUE
+                log = TRUE
             )
         }
-        jnll <- jnll - dseparable(f1, f2)(epsilon_xy)
+        jnll <- jnll - dseparable(f1, f2)(epsilon_xy,
+            scale = sqrt(sig2) / sqrt(1 - rho^2) / sqrt(1 - rho^2))
     }
     # predict densities
     D_xy <- matrix(0, nrow = nrow(epsilon_xy), ncol = ncol(epsilon_xy))
