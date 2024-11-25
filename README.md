@@ -4,11 +4,12 @@
             
 ## Chapter 7 
 
-    - `Integrated_model.R` TMB model from book does not converge so not yet attempted in RTMB
+    - `Integrated_model.R` TMB model from book does not converge
 
 ## Chapter 10
 
     - 'CTMC_eagles.R` example from book doesn't run for me, errors out on line 56
+    - may need help with `CTMC_pacific_cod_RTMB.r` 
 
 ## Chapter 11 
 
