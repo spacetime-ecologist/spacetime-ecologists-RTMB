@@ -1,5 +1,3 @@
-#! WARNING NOT YET WORKING, HANGS WHEN CALLING makeADFun()???
-
 library(sf)
 library(fmesher)
 library(rnaturalearth)
@@ -14,10 +12,16 @@ ice <- read.csv("data/Ice.csv")
 # project data
 sf_ice <- st_as_sf(ice, coords = c("Longitude", "Latitude"))
 st_crs(sf_ice) <- "+proj=longlat +datum=WGS84"
-sf_ice <- st_transform(sf_ice, crs = st_crs("+proj=laea +lat_0=90 +lon_0=-30 +units=km"))
+sf_ice <- st_transform(sf_ice,
+    crs = st_crs("+proj=laea +lat_0=90 +lon_0=-30 +units=km")
+)
 sf_pole <- st_point(c(0, 90))
-sf_pole <- st_sfc(sf_pole, crs = "+proj=longlat +datum=WGS84")
-sf_pole <- st_transform(sf_pole, crs = st_crs("+proj=laea +lat_0=90 +lon_0=-30 +units=km"))
+sf_pole <- st_sfc(sf_pole,
+    crs = "+proj=longlat +datum=WGS84"
+)
+sf_pole <- st_transform(sf_pole,
+    crs = st_crs("+proj=laea +lat_0=90 +lon_0=-30 +units=km")
+)
 sf_pole <- st_buffer(sf_pole, dist = 3000)
 sf_ice <- st_intersection(sf_ice, sf_pole)
 
@@ -109,15 +113,16 @@ map$L_ft[lower.tri(map$L_ft)] <- NA
 map$L_ft <- factor(map$L_ft)
 par$L_ft[lower.tri(par$L_ft)] <- 0
 
-####################################
-## ! warning, will hang when running:
-####################################
+TapeConfig(atomic = "disable") # nifty trick for use if RTMB hangs
 
 obj <- MakeADFun(f, par,
     map = map,
     random = c("omega_s", "epsilon_sf")
 )
-obj$fn()
 
-# opt <- nlminb(obj$par, obj$fn, obj$gr)
-# opt # -9766.518 is book solution
+opt <- nlminb(obj$par, obj$fn, obj$gr,
+    control = list(trace = 1, eval.max = 1e4, iter.max = 1e4)
+)
+opt # -9766.518 is book solution
+
+TapeConfig(atomic = "enable") # set it back

@@ -69,10 +69,6 @@ conditional_dist_ll <- function(epsilon_xy, rho, sigma2, n_x, n_y) {
 }
 
 joint_dist_ll <- function(epsilon_xy, rho, sigma2, n_x, n_y) {
-    ######################################################################
-    # ! NOTE - I originally ran this using loops, but was hanging
-    # ! when calling MakeADFun on my machine. Still hangs when vectorized..
-    #######################################################################
     Q_xx <- matrix(0, n_x, n_x)
     diag(Q_xx) <- 1 + rho^2
     Q_xx[cbind(1:(n_x - 1), 2:n_x)] <- -rho # upper diagonal
@@ -176,12 +172,14 @@ sdr <- sdreport(obj)
 sdr
 
 # fit model using Kronecker product of precision in both dimensions
-# !!!!! WARNING DOES NOT WORK AND HANGS ON MY MACHINE !!!!!!!!!!!!!
+TapeConfig(atomic = "disable") # nifty trick for use if RTMB hangs
 data$ctl <- 2
 obj <- MakeADFun(f, par, random = "epsilon_xy")
-# opt # --> book solves to -1295.976
-# sdr <- sdreport(obj)
-# sdr
+opt <- nlminb(obj$par, obj$fn, obj$gr)
+opt # --> book solves to -1295.976
+sdr <- sdreport(obj)
+sdr
+TapeConfig(atomic = "enable")
 
 # fit model using built-in functions
 data$ctl <- 3
