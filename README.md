@@ -1,6 +1,6 @@
-# Convert Thorson and Kristensen 2024 TMB examples to RTMB
+## Convert Thorson and Kristensen 2024 TMB examples to RTMB
 
-## Issues
+## Issues to be fixed
             
 ## Chapter 7 
 
@@ -9,7 +9,7 @@
 ## Chapter 10
 
     - 'CTMC_eagles.R` example from book doesn't run for me, errors out on line 56
-    - may need help with `CTMC_pacific_cod_RTMB.r` 
+    - may need help coding `CTMC_pacific_cod_RTMB.r` 
 
 ## Chapter 11 
 
