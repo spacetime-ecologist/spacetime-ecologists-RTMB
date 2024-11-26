@@ -96,16 +96,20 @@ make_M <- function(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g) {
     if (CTMC_version == 0) {
         # diffusion
         for (z in 1:n_z) {
-            Mrate_gg[At_zz[z, 1], At_zz[z, 2]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 2]] + D /
-                colsumA_g[At_zz[z, 1]] / DeltaD^2
-            Mrate_gg[At_zz[z, 1], At_zz[z, 1]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 1]] - D /
-                colsumA_g[At_zz[z, 1]] / DeltaD^2
+            Mrate_gg[At_zz[z, 1], At_zz[z, 2]] <-
+                Mrate_gg[At_zz[z, 1], At_zz[z, 2]] + D /
+                    colsumA_g[At_zz[z, 1]] / DeltaD^2
+            Mrate_gg[At_zz[z, 1], At_zz[z, 1]] <-
+                Mrate_gg[At_zz[z, 1], At_zz[z, 1]] - D /
+                    colsumA_g[At_zz[z, 1]] / DeltaD^2
         }
         # taxis
         for (z in 1:n_z) {
-            Mrate_gg[At_zz[z, 1], At_zz[z, 2]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 2]] +
+            Mrate_gg[At_zz[z, 1], At_zz[z, 2]] <-
+                Mrate_gg[At_zz[z, 1], At_zz[z, 2]] +
                 (h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD
-            Mrate_gg[At_zz[z, 1], At_zz[z, 1]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 1]] +
+            Mrate_gg[At_zz[z, 1], At_zz[z, 1]] <-
+                Mrate_gg[At_zz[z, 1], At_zz[z, 1]] +
                 (h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD
         }
     }
@@ -113,10 +117,12 @@ make_M <- function(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g) {
     if (CTMC_version != 0) {
         # combined taxis and diffusion
         for (z in 1:n_z) {
-            Mrate_gg[At_zz[z, 1], At_zz[z, 2]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 2]] + D /
-                (DeltaD^2) * exp((h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD)
-            Mrate_gg[At_zz[z, 1], At_zz[z, 1]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 1]] - D /
-                (DeltaD^2) * exp((h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD)
+            Mrate_gg[At_zz[z, 1], At_zz[z, 2]] <-
+                Mrate_gg[At_zz[z, 1], At_zz[z, 2]] + D /
+                    (DeltaD^2) * exp((h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD)
+            Mrate_gg[At_zz[z, 1], At_zz[z, 1]] <-
+                Mrate_gg[At_zz[z, 1], At_zz[z, 1]] - D /
+                    (DeltaD^2) * exp((h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD)
         }
     }
     Mrate_gg <- as(Mrate_gg, "TsparseMatrix")
@@ -135,14 +141,14 @@ f <- function(par) {
     h_g <- X_gz %*% gamma_z
     Mrate_gg <- make_M(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g)
     # ?? HOW BEST TO TRANSLATE
-    # e <- expm(Mrate_gg)
     REPORT(Mrate_gg)
-    # REPORT(e)
     jnll
 }
-
+f(par) # works
 # build and optimize object
+
+### ! WARNING RTMB HANGS WHEN RUNNING, EVEN IF TAPECONFIG()
 obj <- MakeADFun(f, par)
 
-opt <- nlminb(start = obj$par, obj = obj$fn, gr = obj$gr)
-opt # 161.4145 is book solution
+# opt <- nlminb(start = obj$par, obj = obj$fn, gr = obj$gr)
+# opt # 161.4145 is book solution
