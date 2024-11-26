@@ -1,10 +1,6 @@
 ## Convert Thorson and Kristensen 2024 TMB examples to RTMB
 
 ## Issues to be fixed
-            
-## Chapter 7 
-
-    - `Integrated_model.R` TMB model from book does not converge
 
 ## Chapter 10
 

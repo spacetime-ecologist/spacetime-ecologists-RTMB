@@ -40,7 +40,7 @@ sf_L_gt <- st_sf(st_geometry(bathy_sf), L_gt)
 # Get adjacency matrix using Raster
 A_gg <- adjacent(bathy_terra, cells = 1:prod(dim(bathy_terra)), pairs = TRUE)
 A_gg <- Matrix::sparseMatrix(i = A_gg[, 1], j = A_gg[, 2], x = rep(1, nrow(A_gg)))
-A_gg <- as(A_gg, "TsparseMatrix")
+# A_gg <- as(A_gg, "TsparseMatrix")
 
 # Drop geometry and likelihood with depth <1 m
 which_exclude <- which(bathy_sf$ai_bathy_fill <= 1)
@@ -80,13 +80,29 @@ data <- list(
     "X_gz" = X_gz,
     "At_zz" = At_zz
 )
-make_M <- function(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, solsumA_g) {
-  n_z <- nrow(At_zz)
-  D <- exp(ln_D)
-  if(CTMB_version==){
-    
-  }
+
+make_M <- function(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g) {
+    n_z <- nrow(At_zz)
+    D <- exp(ln_D)
+    Mrate_gg <- matrix(0, nrow = n_g, ncol = n_g)
+    # standard approach
+    if (CTMC_version == 0) {
+        # TODO
+    }
+    # log-space to ensure Metzler matrix
+    if (CTMC_version != 0) {
+        # combined taxis and diffusion
+        for (z in 1:n_z) {
+            Mrate_gg[At_zz[z, 1], At_zz[z, 2]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 2]] + D /
+                (DeltaD^2) * exp((h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD)
+            Mrate_gg[At_zz[z, 1], At_zz[z, 1]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 1]] - D /
+                (DeltaD^2) * exp((h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD)
+        }
+    }
+    Mrate_gg <- as(Mrate_gg, "sparseMatrix")
+    Mrate_gg
 }
+
 f <- function(par) {
     getAll(data, par, warn = FALSE)
     jnll <- 0
@@ -97,12 +113,15 @@ f <- function(par) {
 
     # calculate movement matrix
     h_g <- X_gz %*% gamma_z
-    ...
-    ...
-    ...
+    Mrate_gg <- make_M(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g)
+    # e <- expm(Mrate_gg)
+    REPORT(Mrate_gg)
+    jnll
 }
 
-# Build and optimize object
-obj <- MakeADFun(data = Data, parameters = Params)
+# uild and optimize object
+obj <- MakeADFun(f, par)
+
 opt <- nlminb(start = obj$par, obj = obj$fn, gr = obj$gr)
 opt # 161.4145 is book solution
+TapeConfig(atomic = "enable")
