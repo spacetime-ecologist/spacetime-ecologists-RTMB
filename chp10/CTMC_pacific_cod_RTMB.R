@@ -119,9 +119,9 @@ f <- function(par) {
     jnll
 }
 
-# uild and optimize object
+# build and optimize object
+TapeConfig(atomic = "enable")
 obj <- MakeADFun(f, par)
 
 opt <- nlminb(start = obj$par, obj = obj$fn, gr = obj$gr)
 opt # 161.4145 is book solution
-TapeConfig(atomic = "enable")

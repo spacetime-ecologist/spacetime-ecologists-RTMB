@@ -150,7 +150,6 @@ f <- function(par) {
         }
     }
     REPORT(logmu_g)
-    REPORT(jnll)
     jnll
 }
 

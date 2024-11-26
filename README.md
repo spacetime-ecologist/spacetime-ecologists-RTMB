@@ -1,6 +1,12 @@
-## Convert Thorson and Kristensen 2024 TMB examples to RTMB
+## Thorson and Kristensen 2024 in RTMB
 
-## Issues to be fixed
+RTMB code translations of TMB code associated with textbook:
+
+Thorson, J., and Kristensen, K. 2024. Spatio-Temporal Models for Ecologists. In 1st edition. Chapman and Hall/CRC, Boca Raton, FL.
+
+[https://github.com/James-Thorson/Spatio-temporal-models-for-ecologists](https://github.com/James-Thorson/Spatio-temporal-models-for-ecologists)
+
+## Issues in progress
 
 ## Chapter 10
 
