@@ -2,7 +2,7 @@ library(sf)
 library(Matrix)
 library(RTMB)
 # note: also requires 'igraph' package
-source("shared_functions/rmvnorm_prec.r")
+source("shared_functions/rmvnorm_prec.R")
 set.seed(1) # needed to match book solution, which otherwise is not reproducible
 
 #--------------------------------------------------------------------------------

@@ -3,8 +3,8 @@ library(stars)
 library(diagram)
 library(sem)
 library(RTMB)
-source("shared_functions/build_ram.r")
-source("shared_functions/make_covar.r")
+source("shared_functions/build_ram.R")
+source("shared_functions/make_covar.R")
 
 #--------------------------------------------------------------------------------
 # simulate data and define SEM

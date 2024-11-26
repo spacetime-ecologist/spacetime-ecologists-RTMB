@@ -6,7 +6,7 @@ library(pracma)
 library(plotrix)
 library(stars)
 library(sem)
-source("shared_functions/build_ram.r") # --> needed for build_ram()
+source("shared_functions/build_ram.R") # --> needed for build_ram()
 
 #--------------------------------------------------------------------------------
 # create preference function, simulate the tracks w/taxis,
@@ -55,7 +55,7 @@ t_i <- c(0, cumsum(deltaT_i[-1]))
 # set up covariance function
 #--------------------------------------------------------------------------------
 
-source("shared_functions/make_covar.r")
+source("shared_functions/make_covar.R")
 
 #--------------------------------------------------------------------------------
 # set up simplest model
