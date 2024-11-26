@@ -93,7 +93,7 @@ f <- function(par) {
     getAll(data, par)
     log_b_t <- OBS(log_b_t)
     n_t <- length(log_b_t)
-    rho <- 1 - plogis(logit_rho)
+    rho <- plogis(logit_rho)
     jnll <- 0
     # Pr(random coefficients)
     Q <- Q_ar1(rho, n_t)
