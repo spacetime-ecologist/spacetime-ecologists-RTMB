@@ -10,6 +10,7 @@ library(RTMB)
 # read in data and format for analysis
 #--------------------------------------------------------------------------------
 
+# load data
 bathy_terra <- readRDS("data/ai_bathy_3km.Rds")
 likelihood_terra <- readRDS("data/likelihood_3km.Rds")
 
@@ -40,7 +41,7 @@ sf_L_gt <- st_sf(st_geometry(bathy_sf), L_gt)
 # Get adjacency matrix using Raster
 A_gg <- adjacent(bathy_terra, cells = 1:prod(dim(bathy_terra)), pairs = TRUE)
 A_gg <- Matrix::sparseMatrix(i = A_gg[, 1], j = A_gg[, 2], x = rep(1, nrow(A_gg)))
-# A_gg <- as(A_gg, "TsparseMatrix")
+A_gg <- as(A_gg, "TsparseMatrix")
 
 # Drop geometry and likelihood with depth <1 m
 which_exclude <- which(bathy_sf$ai_bathy_fill <= 1)
@@ -51,9 +52,15 @@ bathy_sf$ai_bathy_fill <- bathy_sf$ai_bathy_fill / 1000
 
 # Assemble inputs
 colsumA_g <- colSums(A_gg)
-I_gg <- Matrix::sparseMatrix(i = 1:nrow(bathy_sf), j = 1:nrow(bathy_sf), x = rep(1, nrow(bathy_sf)))
+I_gg <- Matrix::sparseMatrix(
+    i = 1:nrow(bathy_sf),
+    j = 1:nrow(bathy_sf), x = rep(1, nrow(bathy_sf))
+)
 I_gg <- as(I_gg, "TsparseMatrix")
-D_gg <- Matrix::sparseMatrix(i = 1:nrow(bathy_sf), j = 1:nrow(bathy_sf), x = colsumA_g)
+D_gg <- Matrix::sparseMatrix(
+    i = 1:nrow(bathy_sf),
+    j = 1:nrow(bathy_sf), x = colsumA_g
+)
 D_gg <- as(D_gg, "TsparseMatrix")
 At_zz <- cbind(attr(A_gg, "i"), attr(A_gg, "j"))
 
@@ -78,7 +85,7 @@ data <- list(
     "colsumA_g" = colsumA_g,
     "L_gt" = as.matrix(st_drop_geometry(sf_L_gt)),
     "X_gz" = X_gz,
-    "At_zz" = At_zz
+    "At_zz" = At_zz + 1
 )
 
 make_M <- function(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g) {
@@ -87,7 +94,20 @@ make_M <- function(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g) {
     Mrate_gg <- matrix(0, nrow = n_g, ncol = n_g)
     # standard approach
     if (CTMC_version == 0) {
-        # TODO
+        # diffusion
+        for (z in 1:n_z) {
+            Mrate_gg[At_zz[z, 1], At_zz[z, 2]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 2]] + D /
+                colsumA_g[At_zz[z, 1]] / DeltaD^2
+            Mrate_gg[At_zz[z, 1], At_zz[z, 1]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 1]] - D /
+                colsumA_g[At_zz[z, 1]] / DeltaD^2
+        }
+        # taxis
+        for (z in 1:n_z) {
+            Mrate_gg[At_zz[z, 1], At_zz[z, 2]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 2]] +
+                (h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD
+            Mrate_gg[At_zz[z, 1], At_zz[z, 1]] <- Mrate_gg[At_zz[z, 1], At_zz[z, 1]] +
+                (h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD
+        }
     }
     # log-space to ensure Metzler matrix
     if (CTMC_version != 0) {
@@ -99,7 +119,7 @@ make_M <- function(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g) {
                 (DeltaD^2) * exp((h_g[At_zz[z, 2]] - h_g[At_zz[z, 1]]) / DeltaD)
         }
     }
-    Mrate_gg <- as(Mrate_gg, "sparseMatrix")
+    Mrate_gg <- as(Mrate_gg, "TsparseMatrix")
     Mrate_gg
 }
 
@@ -114,13 +134,14 @@ f <- function(par) {
     # calculate movement matrix
     h_g <- X_gz %*% gamma_z
     Mrate_gg <- make_M(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g)
+    # ?? HOW BEST TO TRANSLATE
     # e <- expm(Mrate_gg)
     REPORT(Mrate_gg)
+    # REPORT(e)
     jnll
 }
 
 # build and optimize object
-TapeConfig(atomic = "enable")
 obj <- MakeADFun(f, par)
 
 opt <- nlminb(start = obj$par, obj = obj$fn, gr = obj$gr)
