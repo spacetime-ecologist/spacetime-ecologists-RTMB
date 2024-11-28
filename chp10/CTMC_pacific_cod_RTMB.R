@@ -131,7 +131,8 @@ f <- function(par) {
     # calculate movement matrix
     h_g <- X_gz %*% gamma_z
     Mrate_gg <- make_M(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g)
-    M_gg <- expm1(Mrate_gg)
+    M_gg <- expm1(Mrate_gg) # ! Errors in this line
+    
     #diag_g <- diag(Mrate_gg)    
     #rho <- 0
     #if (length(diag_g) > 0) {
