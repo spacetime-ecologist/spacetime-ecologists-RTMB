@@ -115,9 +115,6 @@ obj <- MakeADFun(f, par,
     map = list("gamma_k" = factor(NA)) # map this off to match book
 )
 
-obj$fn()
-
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # --> 620.538 is book solution if set.seed(1)
 sdr <- sdreport(obj)

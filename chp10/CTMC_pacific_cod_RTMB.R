@@ -121,15 +121,16 @@ f <- function(par) {
     # calculate movement matrix
     h_g <- X_gz %*% gamma_z
     Mrate_gg <- make_M(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g)
-
+    str(Mrate_gg)
     REPORT(Mrate_gg)
     jnll
 }
 
 f(par) # works
 # build and optimize object
-
+AD(Matrix(0, nrow = 5, ncol = 5))
 obj <- MakeADFun(f, par)
+
 head(obj$report()$`Mrate_gg`)
 # opt <- nlminb(start = obj$par, obj = obj$fn, gr = obj$gr)
 # opt # 161.4145 is book solution
@@ -148,3 +149,6 @@ if (length(diag_g) > 0) {
 A_gg <- Mrate_gg
 diag(A_gg) <- rho
 A_prime_gg <- t(A_gg)
+
+# ever so slight difference Mrate_gg --> rounding errors?
+# explain AD(Matrix)

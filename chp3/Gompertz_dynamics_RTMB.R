@@ -51,8 +51,6 @@ f <- function(par) {
 }
 
 obj <- MakeADFun(f, par, random = "log_d_t")
-obj$fn()
-obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # book solution -13.77209
 sdr <- sdreport(obj)

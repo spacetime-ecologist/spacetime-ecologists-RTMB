@@ -147,7 +147,6 @@ f <- function(par) {
 }
 
 obj <- MakeADFun(f, par, random = c("omega_s", "xi_s", "epsilon_st"))
-obj$fn()
 opt <- nlminb(obj$par, obj$fn, obj$gr,
     control = list(trace = 1, eval.max = 1e4, iter.max = 1e4)
 )
