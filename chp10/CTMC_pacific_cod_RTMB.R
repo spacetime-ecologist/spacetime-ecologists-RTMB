@@ -109,6 +109,16 @@ make_M <- function(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g) {
     Mrate_gg
 }
 
+min_custom <- function(x) {
+  res <- x[1]
+  for (i in 2:length(x)) { 
+    # see https://kaskr.github.io/adcomp/convenience_8hpp_source.html#l00156
+    # conditional logic similar to CppAD::CondExpLt
+    res <- ifelse(res < x[i], res, x[i])
+  }
+  res
+}
+
 f <- function(par) {
     getAll(data, par, warn = FALSE)
     jnll <- 0
@@ -121,14 +131,24 @@ f <- function(par) {
     # calculate movement matrix
     h_g <- X_gz %*% gamma_z
     Mrate_gg <- make_M(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g)
-    str(Mrate_gg)
+    M_gg <- expm1(Mrate_gg)
+    #diag_g <- diag(Mrate_gg)    
+    #rho <- 0
+    #if (length(diag_g) > 0) {
+    #    M <- diag_g[1]
+    #    for (i in 1:length(diag_g)) {
+            # M <- min(M, diag_g[i]) # ! NOTE MINIMUM BREAKS RTMB
+    #    }
+    #    rho <- rho - M
+    #}
+    #A_gg <- Mrate_gg
+    #diag(A_gg) <- rho
+    #A_prime_gg <- t(A_gg)
     REPORT(Mrate_gg)
     jnll
 }
 
 f(par) # works
-# build and optimize object
-AD(Matrix(0, nrow = 5, ncol = 5))
 obj <- MakeADFun(f, par)
 
 head(obj$report()$`Mrate_gg`)
@@ -150,5 +170,6 @@ A_gg <- Mrate_gg
 diag(A_gg) <- rho
 A_prime_gg <- t(A_gg)
 
-# ever so slight difference Mrate_gg --> rounding errors?
-# explain AD(Matrix)
+# ! questions for Kaskr
+# ? ever so slight difference Mrate_gg RTMB and TMB --> rounding errors?
+# ? explain AD(Matrix)
