@@ -1,3 +1,7 @@
+#
+# much help from the DTU crew on this script...
+#
+
 library(terra)
 library(sf)
 library(Matrix)
@@ -96,28 +100,47 @@ make_M <- function(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g) {
     ones <- matrix(1, ncol = 1, nrow = n_g)
     # standard approach
     if (CTMC_version == 0) {
-
+        # ! TODO
     }
     # log-space to ensure Metzler matrix
     if (CTMC_version != 0) {
         # combined taxis and diffusion
         Mrate_gg[At_zz] <- Mrate_gg[At_zz] +
             D / DeltaD^2 * exp((h_g[At_zz[, 2]] - h_g[At_zz[, 1]]) / DeltaD)
-        row_sums <- Mrate_gg %*% ones
+        row_sums <- Mrate_gg %*% ones # rowSums()
         diag(Mrate_gg) <- diag(Mrate_gg) - as.vector(row_sums)
     }
     Mrate_gg
 }
 
-min_custom <- function(x) {
-  res <- x[1]
-  for (i in 2:length(x)) { 
-    # see https://kaskr.github.io/adcomp/convenience_8hpp_source.html#l00156
-    # conditional logic similar to CppAD::CondExpLt
-    res <- ifelse(res < x[i], res, x[i])
-  }
-  res
+min2 <- function(vec) {
+    Reduce(function(x, y) 0.5 * (x + y) - 0.5 * abs(x - y), vec)
 }
+
+# expm_generator <- function(Q, cfg = list(normalize = FALSE)) {
+#     # attempt at coding exp_generator
+#     diag_elements <- diag(Q)
+#     rho <- ifelse(length(diag_elements) > 0, -min2(diag_elements), 0)
+#     A <- Q
+#     diag(A) <- diag(A) + rho
+#     ExpA <- function(x) {
+#         expA_mat <- expm_series(A, cfg$getN(rho), cfg)
+#         y <- expA_mat %*% x
+#         y <- exp(-rho) * y
+#         if (cfg$normalize) {
+#             y <- y / sum(y)
+#         }
+#         y
+#     }
+#     ExpA
+# }
+
+# expm_series <- function(A, N) {
+#     I <- diag(nrow(A))
+#     terms <- sapply(1:N, function(k) (A^k) / factorial(k))
+#     series <- Reduce(`+`, terms) + I
+#     series
+# }
 
 f <- function(par) {
     getAll(data, par, warn = FALSE)
@@ -127,49 +150,71 @@ f <- function(par) {
     forward_prob_gt <- forward_pred_gt <- forward_gt <-
         backward_prob_gt <- backward_pred_gt <-
         backward_gt <- matrix(0, n_g, n_t)
-
     # calculate movement matrix
     h_g <- X_gz %*% gamma_z
     Mrate_gg <- make_M(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g)
-    M_gg <- expm1(Mrate_gg) # ! Errors in this line
-    
-    #diag_g <- diag(Mrate_gg)    
-    #rho <- 0
-    #if (length(diag_g) > 0) {
-    #    M <- diag_g[1]
-    #    for (i in 1:length(diag_g)) {
-            # M <- min(M, diag_g[i]) # ! NOTE MINIMUM BREAKS RTMB
-    #    }
-    #    rho <- rho - M
-    #}
-    #A_gg <- Mrate_gg
-    #diag(A_gg) <- rho
-    #A_prime_gg <- t(A_gg)
+    diag_g <- diag(Mrate_gg)
+    A_gg <- Mrate_gg
+    rho <- 0
+    if (length(diag_g) > 0) {
+        M <- diag_g[1]
+        for (i in 2:length(diag_g)) {
+            M <- min2(c(M, diag_g[i]))
+        }
+        rho <- -M
+    }
+    diag(A_gg) <- diag(A_gg) + rho
+    Aprime_gg <- t(A_gg)
+
+    ############################################
+    ############################################
+    ############################################
+    # I need to figure out how to best code
+    # matrix exponential stuff
+    # expm_series, expm_generator
+    # ! See also
+    # https://kaskr.github.io/adcomp/sparse__matrix__exponential_8hpp_source.html#l00242
+    ############################################
+    ############################################
+    ############################################
+
+    # M_gg <- expm_generator(Mrate_gg, Nmax)
+    # Mseries_gg <- expm_series(A_gg, Nmax)
+    # project forwards
+    forward_prob_gt[, 1] <- L_gt[, 1]
+    for (t in 1:n_t) {
+        if (expm_version == 0) {
+
+        } else {
+
+        }
+    }
+    # accumulator
+    forward_gt <- forward_prob_gt
+
+    # project backwards
+    for (g in 1:n_g) backward_pred_gt[g, n_t - 1] <- 1
+    for (t in (n_t - 2):0) {
+
+    }
+    backward_gt <- backward_pred_gt
+
+    REPORT(A_gg)
+    REPORT(Aprime_gg)
     REPORT(Mrate_gg)
     jnll
 }
 
 f(par) # works
+TapeConfig(atomic = "disable")
 obj <- MakeADFun(f, par)
+TapeConfig(atomic = "enable")
 
-head(obj$report()$`Mrate_gg`)
+
+head(obj$report()$`Aprime_gg`)
+
 # opt <- nlminb(start = obj$par, obj = obj$fn, gr = obj$gr)
 # opt # 161.4145 is book solution
-
-head(Mrate_gg)
-
-#  # diag_g <- diag(Mrate_gg)
-rho <- 0
-if (length(diag_g) > 0) {
-    M <- diag_g[1]
-    for (i in 1:length(diag_g)) {
-        # M <- min(M, diag_g[i]) # ! NOTE MINIMUM BREAKS RTMB
-    }
-    rho <- rho - M
-}
-A_gg <- Mrate_gg
-diag(A_gg) <- rho
-A_prime_gg <- t(A_gg)
 
 # ! questions for Kaskr
 # ? ever so slight difference Mrate_gg RTMB and TMB --> rounding errors?
