@@ -6,6 +6,10 @@ Thorson, J., and Kristensen, K. 2024. Spatio-Temporal Models for Ecologists. In 
 
 [https://github.com/James-Thorson/Spatio-temporal-models-for-ecologists](https://github.com/James-Thorson/Spatio-temporal-models-for-ecologists)
 
+See also RTMB:
+
+[https://github.com/kaskr/RTMB](https://github.com/kaskr/RTMB)
+
 ## Issues in progress
 
 ## Chapter 10

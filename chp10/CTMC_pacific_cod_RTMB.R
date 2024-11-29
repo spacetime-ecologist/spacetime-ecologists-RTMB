@@ -1,5 +1,5 @@
 #
-# much help from the DTU crew on this script...
+# with much help from the DTU crew...
 #
 
 library(terra)
@@ -117,18 +117,6 @@ min2 <- function(vec) {
     Reduce(function(x, y) 0.5 * (x + y) - 0.5 * abs(x - y), vec)
 }
 
-euler_approx <- function(Mrate, log2steps) {
-    ########################
-    # ? is this the best way -- adapted from book code
-    ########################
-    Mrate <- Diagonal(nrow(Mrate)) + Mrate / (2^log2steps)
-    for (i in 1:log2steps) {
-        Mrate <- Mrate %*% Mrate
-    }
-    # Mrate <- zapsmall(Mrate) # ! remember zapsmall option
-    Mrate
-}
-
 f <- function(par) {
     getAll(data, par, warn = FALSE)
     jnll <- 0
@@ -140,59 +128,21 @@ f <- function(par) {
     # calculate movement matrix
     h_g <- X_gz %*% gamma_z
     Mrate_gg <- make_M(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g)
-    diag_g <- diag(Mrate_gg)
-    A_gg <- Mrate_gg
-    rho <- 0
-    if (length(diag_g) > 0) {
-        M <- diag_g[1]
-        for (i in 2:length(diag_g)) {
-            M <- min2(c(M, diag_g[i]))
-        }
-        rho <- -M
+    M_gg <- function(v) { # built-in RTMB way to do uniformization
+        expAv(A = Mrate_gg, v = v, Nmax = Nmax)
     }
-    diag(A_gg) <- diag(A_gg) + rho
-    Aprime_gg <- t(A_gg)
-
-    ############################################
-    ############################################
-    ############################################
-    # I need to figure out how to best code
-    # expm_series, expm_generator for sparse matrices
-    # ! I am specifically struggling with converting anything with expm_series,
-    # ! or expm_generator in these lines:
-    # https://github.com/James-Thorson/Spatio-temporal-models-for-ecologists/blob/dev/Chap_10/hmm_TMB.cpp#L40-L59
-    # ! and which corresponds to these in adcomp:
-    # https://kaskr.github.io/adcomp/sparse__matrix__exponential_8hpp_source.html#l00242
-    ############################################
-    ############################################
-    ############################################
-
-    Mseries_gg <- euler_approx(A_gg, log2steps = 3)
-    Mprimeseries_gg <- euler_approx(Aprime_gg, log2steps = 3)
-
     # project forwards
     forward_prob_gt[, 1] <- L_gt[, 1]
-    for (t in 1:n_t) {
+    for (t in 2:n_t) {
         if (expm_version == 0) {
-
-        } else {
-
+            forward_prob_gt[, t] <- M_gg(forward_prob_gt[, t - 1])
         }
+        forward_pred_gt[, t] <- forward_pred_gt[, t] /
+            sum(forward_pred_gt[, t])
+        forward_pred_gt[, t] <- forward_pred_gt[, t] * L_gt[, t]
+        jnll <- jnll - log(sum(forward_prob_gt[, t]))
+        forward_prob_gt[, t] <- forward_prob_gt[, t] / sum(forward_prob_gt[, t])
     }
-    # # accumulator
-    forward_gt <- forward_prob_gt
-
-    # project backwards
-    backward_pred_gt[1:n_g, n_t - 1] <- 1
-    for (g in 1:n_g) backward_pred_gt[g, n_t - 1] <- 1
-    for (t in (n_t - 2):0) {
-
-    }
-    backward_gt <- backward_pred_gt
-
-    REPORT(A_gg)
-    REPORT(Aprime_gg)
-    REPORT(Mrate_gg)
     jnll
 }
 
@@ -201,12 +151,5 @@ TapeConfig(atomic = "disable")
 obj <- MakeADFun(f, par) # slow but works
 TapeConfig(atomic = "enable")
 
-#------------------
-# These all seem to match TMB to rounding errors:
-head(obj$report()$`A_gg`)
-head(obj$report()$`Aprime_gg`)
-head(obj$report()$`Mrate_gg`)
-#------------------
-
-# opt <- nlminb(obj$par, obj$fn, obj$gr)
-# opt # --> 161.4145 is book solution
+opt <- nlminb(obj$par, obj$fn, obj$gr)
+opt # --> 161.4145 is book solution
