@@ -117,30 +117,17 @@ min2 <- function(vec) {
     Reduce(function(x, y) 0.5 * (x + y) - 0.5 * abs(x - y), vec)
 }
 
-# expm_generator <- function(Q, cfg = list(normalize = FALSE)) {
-#     # attempt at coding exp_generator
-#     diag_elements <- diag(Q)
-#     rho <- ifelse(length(diag_elements) > 0, -min2(diag_elements), 0)
-#     A <- Q
-#     diag(A) <- diag(A) + rho
-#     ExpA <- function(x) {
-#         expA_mat <- expm_series(A, cfg$getN(rho), cfg)
-#         y <- expA_mat %*% x
-#         y <- exp(-rho) * y
-#         if (cfg$normalize) {
-#             y <- y / sum(y)
-#         }
-#         y
-#     }
-#     ExpA
-# }
-
-# expm_series <- function(A, N) {
-#     I <- diag(nrow(A))
-#     terms <- sapply(1:N, function(k) (A^k) / factorial(k))
-#     series <- Reduce(`+`, terms) + I
-#     series
-# }
+euler_approx <- function(Mrate, log2steps) {
+    ########################
+    # ? is this the best way -- adapted from book code
+    ########################
+    Mrate <- Diagonal(nrow(Mrate)) + Mrate / (2^log2steps)
+    for (i in 1:log2steps) {
+        Mrate <- Mrate %*% Mrate
+    }
+    # Mrate <- zapsmall(Mrate) # ! remember zapsmall option
+    Mrate
+}
 
 f <- function(par) {
     getAll(data, par, warn = FALSE)
@@ -170,16 +157,19 @@ f <- function(par) {
     ############################################
     ############################################
     # I need to figure out how to best code
-    # matrix exponential stuff
-    # expm_series, expm_generator
-    # ! See also
+    # expm_series, expm_generator for sparse matrices
+    # ! I am specifically struggling with converting anything with expm_series,
+    # ! or expm_generator in these lines:
+    # https://github.com/James-Thorson/Spatio-temporal-models-for-ecologists/blob/dev/Chap_10/hmm_TMB.cpp#L40-L59
+    # ! and which corresponds to these in adcomp:
     # https://kaskr.github.io/adcomp/sparse__matrix__exponential_8hpp_source.html#l00242
     ############################################
     ############################################
     ############################################
 
-    # M_gg <- expm_generator(Mrate_gg, Nmax)
-    # Mseries_gg <- expm_series(A_gg, Nmax)
+    Mseries_gg <- euler_approx(A_gg, log2steps = 3)
+    Mprimeseries_gg <- euler_approx(Aprime_gg, log2steps = 3)
+
     # project forwards
     forward_prob_gt[, 1] <- L_gt[, 1]
     for (t in 1:n_t) {
@@ -189,10 +179,11 @@ f <- function(par) {
 
         }
     }
-    # accumulator
+    # # accumulator
     forward_gt <- forward_prob_gt
 
     # project backwards
+    backward_pred_gt[1:n_g, n_t - 1] <- 1
     for (g in 1:n_g) backward_pred_gt[g, n_t - 1] <- 1
     for (t in (n_t - 2):0) {
 
@@ -205,17 +196,17 @@ f <- function(par) {
     jnll
 }
 
-f(par) # works
+f(par)
 TapeConfig(atomic = "disable")
-obj <- MakeADFun(f, par)
+obj <- MakeADFun(f, par) # slow but works
 TapeConfig(atomic = "enable")
 
-
+#------------------
+# These all seem to match TMB to rounding errors:
+head(obj$report()$`A_gg`)
 head(obj$report()$`Aprime_gg`)
+head(obj$report()$`Mrate_gg`)
+#------------------
 
-# opt <- nlminb(start = obj$par, obj = obj$fn, gr = obj$gr)
-# opt # 161.4145 is book solution
-
-# ! questions for Kaskr
-# ? ever so slight difference Mrate_gg RTMB and TMB --> rounding errors?
-# ? explain AD(Matrix)
+# opt <- nlminb(obj$par, obj$fn, obj$gr)
+# opt # --> 161.4145 is book solution
