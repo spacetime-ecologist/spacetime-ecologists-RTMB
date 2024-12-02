@@ -14,8 +14,7 @@ See also RTMB:
 
 ## Chapter 10
 
-    - 'CTMC_eagles.R` example from book doesn't run for me, errors out on line 56
-    - may need help coding `CTMC_pacific_cod_RTMB.r` 
+    - Neither of the chapter ten models currently works
 
 ## Chapter 11 
 
