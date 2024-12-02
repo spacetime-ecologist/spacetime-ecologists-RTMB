@@ -1,5 +1,5 @@
 #
-# with much help from the DTU crew...
+# ! WARNING not yet working
 #
 
 library(terra)
@@ -128,17 +128,36 @@ f <- function(par) {
     # calculate movement matrix
     h_g <- X_gz %*% gamma_z
     Mrate_gg <- make_M(CTMC_version, n_g, DeltaD, At_zz, ln_D, h_g, colsumA_g)
-    M_gg <- function(v) { # built-in RTMB way to do uniformization
-        expAv(A = Mrate_gg, v = v, Nmax = Nmax)
+    diag_g <- diag(Mrate_gg)
+    A_gg <- Mrate_gg
+    rho <- 0
+    if (length(diag_g) > 0) {
+        M <- diag_g[1]
+        for (i in 2:length(diag_g)) {
+            M <- min2(c(M, diag_g[i]))
+        }
+        rho <- -M
     }
-    # project forwards
+    diag(A_gg) <- diag(A_gg) + rho
+
+    M_series_gg <- function(v) {
+        expAv(A = A_gg, v = v, transpose = TRUE, Nmax = Nmax)
+    }
+
+    M_gg <- function(v) { # built-in RTMB way to do uniformization
+        expAv(A = Mrate_gg, v = v, transpose = FALSE, Nmax = Nmax)
+    }
+
+    # project forward
     forward_prob_gt[, 1] <- L_gt[, 1]
     for (t in 2:n_t) {
         if (expm_version == 0) {
             forward_prob_gt[, t] <- M_gg(forward_prob_gt[, t - 1])
+        } else {
+            forward_prob_gt[, t] <- M_series_gg(forward_prob_gt[, t - 1])
+            forward_pred_gt[, t] <- exp(-rho) * forward_pred_gt[, t]
         }
-        forward_pred_gt[, t] <- forward_pred_gt[, t] /
-            sum(forward_pred_gt[, t])
+        forward_pred_gt[, t] <- forward_pred_gt[, t] / sum(forward_pred_gt[, t])
         forward_pred_gt[, t] <- forward_pred_gt[, t] * L_gt[, t]
         jnll <- jnll - log(sum(forward_prob_gt[, t]))
         forward_prob_gt[, t] <- forward_prob_gt[, t] / sum(forward_prob_gt[, t])
@@ -147,8 +166,13 @@ f <- function(par) {
 }
 
 f(par)
+
 TapeConfig(atomic = "disable")
 obj <- MakeADFun(f, par) # slow but works
+obj$fn()
+# data$expm_version <- 0 # 0  6e-6  --> TMB gives 378.3975
+# data$expm_version <- 1 # -109.9399 --> TMB gives 359.71
+
 TapeConfig(atomic = "enable")
 
 opt <- nlminb(obj$par, obj$fn, obj$gr)
