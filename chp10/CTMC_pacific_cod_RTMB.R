@@ -145,20 +145,20 @@ f <- function(par) {
     }
 
     M_gg <- function(v) { # built-in RTMB way to do uniformization
-        expAv(A = Mrate_gg, v = v, transpose = FALSE, Nmax = Nmax)
+        expAv(A = Mrate_gg, v = v, transpose = TRUE, Nmax = Nmax)
     }
 
     # project forward
     forward_prob_gt[, 1] <- L_gt[, 1]
     for (t in 2:n_t) {
         if (expm_version == 0) {
-            forward_prob_gt[, t] <- M_gg(forward_prob_gt[, t - 1])
+            forward_pred_gt[, t] <- M_gg(forward_prob_gt[, t - 1])
         } else {
             forward_prob_gt[, t] <- M_series_gg(forward_prob_gt[, t - 1])
             forward_pred_gt[, t] <- exp(-rho) * forward_pred_gt[, t]
         }
         forward_pred_gt[, t] <- forward_pred_gt[, t] / sum(forward_pred_gt[, t])
-        forward_pred_gt[, t] <- forward_pred_gt[, t] * L_gt[, t]
+        forward_prob_gt[, t] <- forward_pred_gt[, t] * L_gt[, t]
         jnll <- jnll - log(sum(forward_prob_gt[, t]))
         forward_prob_gt[, t] <- forward_prob_gt[, t] / sum(forward_prob_gt[, t])
     }
