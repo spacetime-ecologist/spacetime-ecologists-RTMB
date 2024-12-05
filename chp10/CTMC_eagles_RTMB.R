@@ -152,14 +152,20 @@ f <- function(par) {
     M_ss <- expm(Mrate_ss)
     ln_Dhat_st[, 1] <- beta_t[1]
     # initial density
-    jnll <- jnll - dgmrf(x = ln_D_st[, 1], mu = ln_Dhat_st[, 1], Q = Q_ss, log = TRUE)
+    jnll <- jnll - dgmrf(
+        x = ln_D_st[, 1],
+        mu = ln_Dhat_st[, 1], Q = Q_ss, log = TRUE
+    )
     # project density forward
     tmp_s <- numeric(n_s)
     for (t in 2:n_t) {
         tmp_s <- exp(ln_D_st[, t - 1])
         tmp_s <- as.vector(t(tmp_s) %*% M_ss)
-        ln_D_st[, t] <- beta_t[t] + log(tmp_s)
-        jnll <- jnll - dgmrf(x = ln_D_st[, t], mu = ln_Dhat_st[, t], Q = Q_ss, log = TRUE)
+        ln_Dhat_st[, t] <- beta_t[t] + log(tmp_s)
+        jnll <- jnll - dgmrf(
+            x = ln_D_st[, t],
+            mu = ln_Dhat_st[, t], Q = Q_ss, log = TRUE
+        )
     }
     # project density w/o process errors
     proj_st <- AD(Matrix(0, n_s, n_t))
@@ -181,10 +187,10 @@ f <- function(par) {
 
 f(par)
 TapeConfig(atomic = "disable")
-TMB::config(tmbad.sparse_hessian_compress = TRUE) # ??
+TMB::config(tmbad.sparse_hessian_compress = TRUE)
 map <- list(ln_D = factor(NA))
 obj <- MakeADFun(f, par, random = c("beta_t", "ln_D_st"), map = map)
 
 image(obj$env$spHess(random = TRUE)) # ! something very wrong with inner hessian ln_D_st
 
-# opt <- nlminb(obj$par, obj$fn, obj$gr) # --> book solves to 8833.474
+opt <- nlminb(obj$par, obj$fn, obj$gr) # --> book solves to 8833.474

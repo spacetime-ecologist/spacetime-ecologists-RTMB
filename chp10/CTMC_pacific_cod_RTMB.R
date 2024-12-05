@@ -79,7 +79,7 @@ X_gz <- model.matrix(preference_formula, data = bathy_sf)
 set.seed(1) # --> ensure reproducibility for re starting values
 par <- list(
     "ln_D" = 1,
-    "gamma_z" = 0.01 * rnorm(ncol(X_gz))
+    "gamma_z" = c(0, 0)
 )
 
 data <- list(
@@ -169,11 +169,6 @@ f(par)
 
 TapeConfig(atomic = "disable")
 obj <- MakeADFun(f, par) # slow but works
-obj$fn()
-# data$expm_version <- 0 # 0  6e-6  --> TMB gives 378.3975
-# data$expm_version <- 1 # -109.9399 --> TMB gives 359.71
-
-TapeConfig(atomic = "enable")
-
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # --> 161.4145 is book solution
+TapeConfig(atomic = "enable")

@@ -55,7 +55,6 @@ opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # book solution -13.77209
 sdr <- sdreport(obj)
 sdr
-obj$simulate()
 
 #--------------------------------------------------------------------------------
 # fit SAR Gompertz using RTMB
@@ -110,4 +109,3 @@ opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # book solution -13.91269 when I solve book version on logit_rho
 sdr <- sdreport(obj)
 sdr
-obj$simulate()
