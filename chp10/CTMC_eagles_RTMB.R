@@ -1,16 +1,6 @@
-##################################
-##################################
-##################################
-##################################
-##################################
-# ! WARNING - not yet finished
-# ! Confusing - inner hessian failure
-# ! with ln_D_st...
-##################################
-##################################
-##################################
-##################################
-##################################
+#
+# ! WARNING not yet working
+#
 
 library(RTMB)
 library(sf)
@@ -191,6 +181,6 @@ TMB::config(tmbad.sparse_hessian_compress = TRUE)
 map <- list(ln_D = factor(NA))
 obj <- MakeADFun(f, par, random = c("beta_t", "ln_D_st"), map = map)
 
-image(obj$env$spHess(random = TRUE)) # ! something very wrong with inner hessian ln_D_st
+image(obj$env$spHess(random = TRUE))
 
-opt <- nlminb(obj$par, obj$fn, obj$gr) # --> book solves to 8833.474
+# opt <- nlminb(obj$par, obj$fn, obj$gr) # --> book solves to 8833.474
