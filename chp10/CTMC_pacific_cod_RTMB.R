@@ -15,8 +15,8 @@ library(RTMB)
 #--------------------------------------------------------------------------------
 
 # load data
-bathy_terra <- readRDS("data/ai_bathy_3km.Rds")
-likelihood_terra <- readRDS("data/likelihood_3km.Rds")
+bathy_terra <- readRDS("ai_bathy_3km.Rds")
+likelihood_terra <- readRDS("likelihood_3km.Rds")
 
 # get land layer
 sf_states <- ne_states("united states of america", return = "sf")
