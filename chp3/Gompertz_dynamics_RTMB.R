@@ -7,7 +7,7 @@ library(diagram)
 # read in data, manipulate for analysis
 #--------------------------------------------------------------------------------
 
-index_t <- read.csv(file = "data/Biomass_index.csv")
+index_t <- read.csv(file = "Biomass_index.csv")
 index_t <- array(index_t[, 2], dimnames = list(index_t[, 1]))
 brange <- range(index_t) * c(0.8, 1.2)
 prange <- c(0.5, 2)
@@ -51,8 +51,8 @@ f <- function(par) {
 }
 
 obj <- MakeADFun(f, par, random = "log_d_t")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # book solution -13.77209
+opt1 <- nlminb(obj$par, obj$fn, obj$gr)
+opt1
 sdr <- sdreport(obj)
 sdr
 
@@ -105,7 +105,7 @@ f <- function(par) {
 }
 
 obj <- MakeADFun(f, par, random = "eps_t")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # book solution -13.91269 when I solve book version on logit_rho
+opt2 <- nlminb(obj$par, obj$fn, obj$gr)
+opt2
 sdr <- sdreport(obj)
 sdr

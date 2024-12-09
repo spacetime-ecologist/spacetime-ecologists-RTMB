@@ -12,13 +12,13 @@ library(RTMBconvenience)
 # read in data, manipulate for analysis
 #--------------------------------------------------------------------------------
 
-data <- read.csv("data/red_snapper_data.csv")
+data <- read.csv("red_snapper_data.csv")
 sf_data <- st_as_sf(data, coords = c("Lon", "Lat"), crs = st_crs("EPSG:4326"))
 sf_data$Year <- factor(sf_data$Year)
-extent <- st_read("data/red_snapper_extent.shp", crs = st_crs("EPSG:4326"))
+extent <- st_read("red_snapper_extent.shp", crs = st_crs("EPSG:4326"))
 coast_sf <- ne_coastline(scale = 10, returnclass = "sf")
 
-bathy <- rast("data/bathy.grd")
+bathy <- rast("bathy.grd")
 sf_bathy <- st_as_sf(as.data.frame(bathy / 1000, xy = TRUE),
     coords = c("x", "y"), crs = st_crs("EPSG:4326")
 )
@@ -155,6 +155,6 @@ f <- function(par) {
 
 obj <- MakeADFun(f, par, random = "omega_s")
 opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # --> book solution 25102.1 when scaling
+opt
 sdr <- sdreport(obj, getJointPrecision = TRUE)
 sdr

@@ -8,7 +8,7 @@ library(RTMB)
 # read in data and format for analysis
 #--------------------------------------------------------------------------------
 
-ozone <- st_read("data/2019_ozone.csv",
+ozone <- st_read("2019_ozone.csv",
     options = c("X_POSSIBLE_NAMES=X", "Y_POSSIBLE_NAMES=Y"),
     crs = st_crs("+proj=longlat +datum=WGS84")
 )
@@ -132,6 +132,6 @@ f <- function(par) {
 
 obj <- MakeADFun(f, par, random = "xi_sj")
 opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # book solution is -289529.9
+opt
 sdr <- sdreport(obj)
 sdr

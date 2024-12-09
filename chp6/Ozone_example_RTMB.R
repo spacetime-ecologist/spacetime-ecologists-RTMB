@@ -2,14 +2,14 @@ library(sf)
 library(fmesher)
 library(rnaturalearth)
 library(RTMB)
-# Note, also requires stars package
+# note, also requires stars package
 
 #--------------------------------------------------------------------------------
 # read in data and manipulate for analysis
 #--------------------------------------------------------------------------------
 
 # ozone data
-ozone <- st_read("data/2019_ozone.csv",
+ozone <- st_read("2019_ozone.csv",
     options = c("X_POSSIBLE_NAMES=X", "Y_POSSIBLE_NAMES=Y"),
     crs = st_crs("+proj=longlat +datum=WGS84")
 )
@@ -18,7 +18,7 @@ ozone$Daily.Max.8.hour.Ozone.Concentration <-
 ozone <- subset(ozone, Date == "07/01/2019")
 
 # density data
-pop_dens <- st_read("data/population_density.csv",
+pop_dens <- st_read("population_density.csv",
     options = c("X_POSSIBLE_NAMES=X", "Y_POSSIBLE_NAMES=Y"),
     crs = st_crs("+proj=longlat +datum=WGS84")
 )
@@ -120,7 +120,7 @@ f <- function(par) {
 obj <- MakeADFun(f, par, random = "omega_s")
 
 opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # book solution is -1077.639
+opt
 
 sdr <- sdreport(obj,
     bias.correct = TRUE,

@@ -18,7 +18,7 @@ sf_states <- st_intersection(st_sfc(borders,
 ), sf_states)
 sf_states <- st_union(sf_states)
 
-samples <- st_read("data/samples_3520.csv",
+samples <- st_read("samples_3520.csv",
     options = c("X_POSSIBLE_NAMES=X", "Y_POSSIBLE_NAMES=Y")
 )
 st_crs(samples) <- "+proj=longlat +datum=WGS84"
@@ -166,17 +166,17 @@ f <- function(par) {
 # fit model conditional in y, joint in x:
 data$ctl <- 1
 obj <- MakeADFun(f, par, random = "epsilon_xy")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # --> book solves to -1295.902
+opt1 <- nlminb(obj$par, obj$fn, obj$gr)
+opt1
 sdr <- sdreport(obj)
 sdr
 
 # fit model using Kronecker product of precision in both dimensions
-TapeConfig(atomic = "disable") # nifty trick for use if RTMB hangs
+TapeConfig(atomic = "disable") # trick for use if RTMB hangs doing matrix algebra
 data$ctl <- 2
 obj <- MakeADFun(f, par, random = "epsilon_xy")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # --> book solves to -1295.976
+opt2 <- nlminb(obj$par, obj$fn, obj$gr)
+opt2
 sdr <- sdreport(obj)
 sdr
 TapeConfig(atomic = "enable")
@@ -184,7 +184,7 @@ TapeConfig(atomic = "enable")
 # fit model using built-in functions
 data$ctl <- 3
 obj <- MakeADFun(f, par, random = "epsilon_xy")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # --> book solves to 160.5713
+opt3 <- nlminb(obj$par, obj$fn, obj$gr)
+opt3
 sdr <- sdreport(obj)
 sdr

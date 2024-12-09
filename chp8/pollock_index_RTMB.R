@@ -10,7 +10,7 @@ library(RTMB)
 # read in data and format for analysis
 #--------------------------------------------------------------------------------
 
-pollock <- readRDS("data/pollock.rds")
+pollock <- readRDS("pollock.rds")
 pollock <- st_as_sf(pollock,
     coords = c("Long", "Lat"),
     crs = "+proj=longlat +datum=WGS84"
@@ -18,8 +18,8 @@ pollock <- st_as_sf(pollock,
 pollock <- st_transform(pollock,
     crs = st_crs("+proj=utm +zone=2 +datum=WGS84 +units=km")
 )
-coldpool <- readRDS("data/coldpool.rds")
-survey_domain <- readRDS("data/survey_domain.rds")
+coldpool <- readRDS("coldpool.rds")
+survey_domain <- readRDS("survey_domain.rds")
 survey_domain <- st_sfc(survey_domain, crs = "+proj=longlat +datum=WGS84")
 survey_domain <- st_transform(survey_domain, crs = st_crs(pollock))
 
@@ -166,7 +166,7 @@ obj <- MakeADFun(f, par, random = c("omega_s", "epsilon_st"))
 opt <- nlminb(obj$par, obj$fn, obj$gr,
     control = list(trace = 1, eval.max = 1e4, iter.max = 1e4)
 )
-opt # book solution is 70074.48
+opt
 
 sdr <- sdreport(obj)
 sdr

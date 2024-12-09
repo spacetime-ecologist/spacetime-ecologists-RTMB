@@ -3,8 +3,8 @@ library(stars)
 library(diagram)
 library(sem)
 library(RTMB)
-source("shared_functions/build_ram.R")
-source("shared_functions/make_covar.R")
+source("build_ram.R")
+source("make_covar.R")
 
 #--------------------------------------------------------------------------------
 # simulate data and define SEM
@@ -88,6 +88,6 @@ f <- function(par) {
 map <- list("x_iz" = factor(cbind(NA, NA, 1:nrow(data$y_iz))))
 obj <- MakeADFun(f, par, random = "x_iz", map = map)
 opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # book solves to 176.9859
+opt
 sdr <- sdreport(obj)
 sdr

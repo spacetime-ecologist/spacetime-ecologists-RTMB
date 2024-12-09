@@ -7,7 +7,7 @@ library(RTMB)
 # read in data and format for analysis
 #--------------------------------------------------------------------------------
 
-ice <- read.csv("data/Ice.csv")
+ice <- read.csv("Ice.csv")
 
 # project data
 sf_ice <- st_as_sf(ice, coords = c("Longitude", "Latitude"))
@@ -113,16 +113,13 @@ map$L_ft[lower.tri(map$L_ft)] <- NA
 map$L_ft <- factor(map$L_ft)
 par$L_ft[lower.tri(par$L_ft)] <- 0
 
-TapeConfig(atomic = "disable") # nifty trick for use if RTMB hangs
-
+TapeConfig(atomic = "disable") # for use if RTMB hangs doing matrix algebra
 obj <- MakeADFun(f, par,
     map = map,
     random = c("omega_s", "epsilon_sf")
 )
-
 opt <- nlminb(obj$par, obj$fn, obj$gr,
     control = list(trace = 1, eval.max = 1e4, iter.max = 1e4)
 )
-opt # -9766.518 is book solution
-
+opt
 TapeConfig(atomic = "enable") # set it back

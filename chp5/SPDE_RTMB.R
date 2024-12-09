@@ -7,7 +7,7 @@ library(RTMB)
 # read in data and manipulate for analysis
 #--------------------------------------------------------------------------------
 
-out <- st_read("data/samples_3520.csv",
+out <- st_read("samples_3520.csv",
     options = c("X_POSSIBLE_NAMES=X", "Y_POSSIBLE_NAMES=Y")
 )
 st_crs(out) <- "+proj=longlat +datum=WGS84"
@@ -79,6 +79,6 @@ f <- function(par) {
 
 obj <- MakeADFun(f, par, random = "omega_s")
 opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # book solution 196.619
+opt
 sdr <- sdreport(obj, bias.correct = TRUE)
 sdr

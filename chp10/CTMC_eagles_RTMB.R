@@ -45,9 +45,9 @@ sf_states <- sf_states[which_max]
 sf_states <- st_simplify(sf_states, dTolerance = 10)
 
 # load copNDVI (saved from rasterdiv)
-copNDVI <- raster("data/NDVI.tif")
+copNDVI <- raster("NDVI.tif")
 
-samples <- st_read("data/samples_3520.csv",
+samples <- st_read("samples_3520.csv",
     options = c("X_POSSIBLE_NAMES=X", "Y_POSSIBLE_NAMES=Y")
 )
 st_crs(samples) <- "+proj=longlat +datum=WGS84"
@@ -56,8 +56,8 @@ samples$Year <- as.numeric(samples$Year)
 samples$SpeciesTotal <- as.numeric(samples$SpeciesTotal)
 cellsize <- 200
 
-df_grid <- st_read("data/df_grid.shp")
-sf_grid <- st_geometry(st_read("data/sf_grid.shp"))
+df_grid <- st_read("df_grid.shp")
+sf_grid <- st_geometry(st_read("sf_grid.shp"))
 
 # bin into grids
 samples <- st_intersection(samples, sf_grid)

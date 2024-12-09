@@ -2,7 +2,7 @@ library(sf)
 library(Matrix)
 library(RTMB)
 # note: also requires 'igraph' package
-source("shared_functions/rmvnorm_prec.R")
+source("rmvnorm_prec.R")
 set.seed(1) # needed to match book solution, which otherwise is not reproducible
 
 #--------------------------------------------------------------------------------
@@ -116,6 +116,6 @@ obj <- MakeADFun(f, par,
 )
 
 opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # --> 620.538 is book solution if set.seed(1)
+opt
 sdr <- sdreport(obj)
 sdr

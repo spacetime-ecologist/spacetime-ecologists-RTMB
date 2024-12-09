@@ -7,7 +7,7 @@ library(rnaturalearth)
 # read in data and format for analysis
 #--------------------------------------------------------------------------------
 
-pollock <- readRDS("data/pollock.rds")
+pollock <- readRDS("pollock.rds")
 pollock <- st_as_sf(pollock,
     coords = c("Long", "Lat"),
     crs = "+proj=longlat +datum=WGS84"
@@ -15,8 +15,8 @@ pollock <- st_as_sf(pollock,
 pollock <- st_transform(pollock,
     crs = st_crs("+proj=utm +zone=2 +datum=WGS84 +units=km")
 )
-coldpool <- readRDS("data/coldpool.rds")
-survey_domain <- readRDS("data/survey_domain.rds")
+coldpool <- readRDS("coldpool.rds")
+survey_domain <- readRDS("survey_domain.rds")
 survey_domain <- st_sfc(survey_domain, crs = "+proj=longlat +datum=WGS84")
 survey_domain <- st_transform(survey_domain,
     crs = st_crs("+proj=utm +zone=2 +datum=WGS84 +units=km")
@@ -85,7 +85,6 @@ f <- function(par) {
     Q <- exp(2 * ln_tauE) * (exp(4 * ln_kappa) * M0 + 2 * exp(2 * ln_kappa) * M1 + M2)
     jnll <- jnll - dgmrf(omega_s, mu = 0, Q = Q, scale = 1 / exp(ln_tauO), TRUE)
     jnll <- jnll - dgmrf(xi_s, 0, Q = Q, scale = 1 / exp(ln_tauX), TRUE)
-
     for (t in 1:n_t) {
         if (t == 1) {
             jnll <- jnll - dgmrf(epsilon_st[, t],
@@ -98,7 +97,6 @@ f <- function(par) {
             )
         }
     }
-
     omega_g <- A_gs %*% omega_s
     xi_g <- A_gs %*% xi_s
     epsilon_gt <- A_gs %*% epsilon_st
@@ -151,6 +149,6 @@ opt <- nlminb(obj$par, obj$fn, obj$gr,
     control = list(trace = 1, eval.max = 1e4, iter.max = 1e4)
 )
 opt
-opt # --> book solution is 70031.49
+opt
 sdr <- sdreport(obj, bias.correct = FALSE, getJointPrecision = TRUE)
 sdr

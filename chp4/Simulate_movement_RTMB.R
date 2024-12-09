@@ -6,7 +6,7 @@ library(pracma)
 library(plotrix)
 library(stars)
 library(sem)
-source("shared_functions/build_ram.R") # --> needed for build_ram()
+source("build_ram.R") # --> needed for build_ram()
 
 #--------------------------------------------------------------------------------
 # create preference function, simulate the tracks w/taxis,
@@ -55,7 +55,7 @@ t_i <- c(0, cumsum(deltaT_i[-1]))
 # set up covariance function
 #--------------------------------------------------------------------------------
 
-source("shared_functions/make_covar.R")
+source("make_covar.R")
 
 #--------------------------------------------------------------------------------
 # set up simplest model
@@ -128,8 +128,8 @@ f <- function(par) {
 }
 
 obj <- MakeADFun(f, par, random = "x_iz")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # 313.7647 is book answer
+opt1 <- nlminb(obj$par, obj$fn, obj$gr)
+opt1
 sdr <- sdreport(obj)
 sdr
 
@@ -143,16 +143,16 @@ par$beta_jz <- matrix(0, nrow = ncol(data$X_ij), ncol = 2)
 
 # Refit model
 obj <- MakeADFun(f, par, random = "x_iz")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # 285.5892 is book answer
+opt2 <- nlminb(obj$par, obj$fn, obj$gr)
+opt2
 sdr <- sdreport(obj)
 sdr
 
 #------------------------------------------------------------------------------
 # Northern fur seal demo
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
-DF <- read.csv("data/FSdata_2016.csv")
+DF <- read.csv("FSdata_2016.csv")
 DF <- st_as_sf(DF, coords = c("longitude", "latitude"), crs = "+proj=longlat")
 DF <- st_transform(DF, crs = "+proj=utm +datum=WGS84 +units=km +zone=2")
 
@@ -186,14 +186,14 @@ data$y_iz[-which_include, ] <- NA
 
 # Refit model
 obj <- MakeADFun(f, par, random = "x_iz")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # 133.0738 is book answer
+opt3 <- nlminb(obj$par, obj$fn, obj$gr)
+opt3
 sdr <- sdreport(obj)
 sdr
 
 #------------------------------------------------------------------------------
 # simulate multiple tracks
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 # parameters
 gamma_t <- beta_t <- seq(0.5, -0.5, length = n_t)
@@ -235,8 +235,8 @@ data$y_iz[-which_include, ] <- NA
 
 # refit model
 obj <- MakeADFun(f, par, random = "x_iz")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # 1860.966 is book answer
+opt4 <- nlminb(obj$par, obj$fn, obj$gr)
+opt4
 sdr <- sdreport(obj)
 sdr
 
@@ -247,8 +247,8 @@ sdr
 data$n_factors <- 2
 par$sigma2_z <- rep(0.1, 2 * ncol(y_iz))
 obj <- MakeADFun(f, par, random = "x_iz")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # 1790.638 is book answer
+opt5 <- nlminb(obj$par, obj$fn, obj$gr)
+opt5
 sdr <- sdreport(obj)
 sdr
 
@@ -269,7 +269,7 @@ SEM_model <- sem::specifyModel(
     endog.variances = TRUE,
     covs = colnames(y_iz)
 )
-RAM <- build_ram(SEM_model, colnames(y_iz)) # uses Jim's helper
+RAM <- build_ram(SEM_model, colnames(y_iz))
 
 # build with RAM
 data$n_factors <- 0
@@ -278,8 +278,8 @@ data$RAM[data$RAM[, 1] == 2, 4] <- 2
 par$sigma2_z <- rep(0.1, max(data$RAM[, 4]))
 
 obj <- MakeADFun(f, par, random = "x_iz")
-opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # 1846.172 is book answer
+opt6 <- nlminb(obj$par, obj$fn, obj$gr)
+opt6
 sdr <- sdreport(obj)
 sdr
 obj$report()$V_zz

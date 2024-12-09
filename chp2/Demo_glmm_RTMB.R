@@ -6,7 +6,7 @@ library(tmbstan)
 # load data, manipulate it for analysis
 #--------------------------------------------------------------------------------
 
-vismba <- readRDS("data/vismba.rds")
+vismba <- readRDS("vismba.rds")
 samples <- data.frame("x" = vismba$gx, "y" = vismba$gy, "agb" = vismba$agb)
 samples <- st_as_sf(samples, coords = c("x", "y"))
 
@@ -57,7 +57,7 @@ f <- function(par) {
 
 obj <- MakeADFun(f, par, random = "eps_i")
 opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # book solution 63.20921
+opt
 
 sdr <- sdreport(obj, getJointPrecision = TRUE)
 parhat <- summary(sdr, "fixed")

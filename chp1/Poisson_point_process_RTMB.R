@@ -87,7 +87,7 @@ f <- function(par) {
 
 obj <- MakeADFun(f, par)
 opt <- nlminb(obj$par, obj$fn, obj$gr)
-opt # book solution 867.6721
+opt
 sdr <- sdreport(obj)
 sdr
 
