@@ -28,7 +28,7 @@ which runs in approximately 17 minutes on a laptop with 64 GB RAM and 20 cores. 
 ```shell
 cat RTMB.res
 ```
-Note that all packages required to run the individual chapter scripts must be insalled prior to using the `Makefile` 
+Note that all packages required to run the individual chapter scripts must be installed prior to using the `Makefile` 
 
 ## Known issues
 
