@@ -35,3 +35,11 @@ Note that all packages required to run the individual chapter scripts must be in
 - chapter 10 models do not yet work (in progress)
 - chapter 11 `BBS.R` from book does not run, errors out on line 42
 
+## Funding acknowledgements
+
+Funding for Cahill's effort was provided by supporting partners of the Quantitative Fisheries Center, 
+which includes Michigan State University, Michigan Department of Natural Resources (DNR), 
+the Great Lakes Fishery Commission, and multiple Council of Lake Committee Agencies including the Michigan DNR, Ohio DNR, Minnesota DNR, 
+Illinois DNR, Wisconsin DNR, Pennsylvania Fish and Game Commission, 
+New York State Department of Environmental Conservation, 
+Ontario Ministry of Natural Resources, and the Great Lakes Indian Fish and Wildlife Commission. 
