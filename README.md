@@ -37,7 +37,7 @@ Note that all packages required to run the individual chapter scripts must be in
 
 ## Funding acknowledgements
 
-Funding for Cahill's effort was provided by supporting partners of the Quantitative Fisheries Center, 
+Cahill's effort was funded by supporting partners of the Quantitative Fisheries Center, 
 which includes Michigan State University, Michigan Department of Natural Resources (DNR), 
 the Great Lakes Fishery Commission, and multiple Council of Lake Committee Agencies including the Michigan DNR, Ohio DNR, Minnesota DNR, 
 Illinois DNR, Wisconsin DNR, Pennsylvania Fish and Game Commission, 
