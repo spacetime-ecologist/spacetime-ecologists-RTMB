@@ -1,15 +1,15 @@
 #
 #       run and save all opt$objective
 # from each '_RTMB.R' file in this repository
-#             and store in RTMB.res 
+#           and store in RTMB.res 
 #
 
 # define the directory as the current directory
 RTMBDIR := $(CURDIR)
 
-# find _RTMB.R files in the current directory, ignore chapter 10
+# find _RTMB.R files in the current directory, ignore ch 10 & 11
 infiles := $(shell find $(RTMBDIR) -type f -name \*_RTMB.R \
-	! -path "$(RTMBDIR)/chp10/*")
+	! -path "$(RTMBDIR)/chp10/*" ! -path "$(RTMBDIR)/chp11/*")
 outfiles := $(shell echo $(infiles) | sed s/_RTMB.R/_RTMB.chk/g)
 
 .PHONY: all clean list res

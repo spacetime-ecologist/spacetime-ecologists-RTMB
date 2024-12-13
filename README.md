@@ -23,7 +23,7 @@ All working RTMB models can be executed by entering the ST_for_ecologists_RTMB f
 ```shell
 make -j 4 -l 2
 ```
-which runs in approximately 17 minutes on a laptop with 64 GB RAM and 20 cores.  Each RTMB model's fitted negative log likelihood can then be inspected via
+Each RTMB model's fitted negative log likelihood can then be inspected via
 
 ```shell
 cat RTMB.res
@@ -32,8 +32,7 @@ Note that all packages required to run the individual chapter scripts must be in
 
 ## Known issues
 
-- chapter 10 models do not yet work (in progress)
-- chapter 11 `BBS.R` from book does not run, errors out on line 42
+- chapter 10 and 11 models do not yet work (in progress)
 
 ## Funding acknowledgements
 
