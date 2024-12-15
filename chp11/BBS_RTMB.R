@@ -136,10 +136,10 @@ par <- list(
     "alpha_c" = rep(0, length(taxa)),
     "lambda_jc" = ifelse(Lform_jc == 0, 0, 1) *
         rmatrix(sd = 0.1, nrow = nrow(Lform_jc), ncol = ncol(Lform_jc)),
-    "beta_kc" = matrix(0, nrow = ncol(X_ik), ncol = length(taxa)),
-    "gamma_sh" = matrix(0, nrow = nrow(spde$c0), ncol = nrow(T_hc)),
-    "delta_sg" = matrix(0, nrow = nrow(spde$c0), ncol = nrow(C_gc)),
-    "omega_sj" = matrix(0, nrow = nrow(spde$c0), ncol = nrow(Lform_jc))
+    "beta_kc" = rmatrix(sd = 0.1, nrow = ncol(X_ik), ncol = length(taxa)),
+    "gamma_sh" = rmatrix(sd = 0.1, nrow = nrow(spde$c0), ncol = nrow(T_hc)),
+    "delta_sg" = rmatrix(sd = 0.1, nrow = nrow(spde$c0), ncol = nrow(C_gc)),
+    "omega_sj" = rmatrix(sd = 0.1, nrow = nrow(spde$c0), ncol = nrow(Lform_jc))
 )
 
 data <- list(
@@ -219,7 +219,7 @@ opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt
 # --> book solution is 39014.2
 # --> RTMB solution is ~39113
-# sdr <- sdreport(obj, getReportCovariance = TRUE)
+# sdr <- sdreport(obj, getReportCovariance = FALSE)
 # sdr # nonpositive definite hessian
 TapeConfig(atomic = "enable")
 
