@@ -32,7 +32,7 @@ Note that all packages required to run the individual chapter scripts must be in
 
 ## Known issues
 
-- chapter 10 and 11 models do not yet work (in progress)
+- chapter 10 models do not yet work (in progress)
 
 ## Funding acknowledgements
 

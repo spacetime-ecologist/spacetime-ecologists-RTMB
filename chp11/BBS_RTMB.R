@@ -1,7 +1,3 @@
-#
-# ! WARNING not yet working
-#
-
 library(sf)
 library(ape)
 library(rnaturalearth)
@@ -217,46 +213,6 @@ TapeConfig(atomic = "disable") # use if RTMB hangs doing matrix algebra
 obj <- MakeADFun(f, par, random = random, map = map)
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt
-# --> book solution is 39014.2
-# --> RTMB solution is ~39113
+# not run because it takes a while to run:
 # sdr <- sdreport(obj, getReportCovariance = FALSE)
-# sdr # nonpositive definite hessian
-TapeConfig(atomic = "enable")
-
-#######################################
-#######################################
-#######################################
-
-# output of sdreport() from TMB model here:
-
-#                  Estimate   Std. Error
-# ln_kappa    -7.946518e-01 7.573321e-02
-# ln_sigmaM    1.632618e+00 1.068183e-02
-# ln_sigmaC   -1.251453e-01 9.361555e-02
-# ln_sigmaT_h -1.167203e+01 4.172870e+03 *** Look here
-# ln_sigmaT_h -1.908324e+00 3.700349e-01
-# ln_sigmaT_h -1.133213e+01 3.251854e+03 *** Look here
-# ln_sigmaT_h -7.337134e+00 2.533691e+02 *** Look here
-# ln_sigmaT_h -1.341758e+00 2.201010e-01
-# ln_sigmaT_h -1.338727e+00 2.320192e-01
-# lambda_jc    1.429537e+00 1.758419e-01
-# lambda_jc    3.123476e-01 2.384008e-01
-# lambda_jc    6.814828e-01 1.321837e-01
-# lambda_jc    1.308617e+00 1.767842e-01
-# lambda_jc   -8.438440e-01 1.452769e-01
-# lambda_jc    5.171575e-06 6.658800e-01
-# lambda_jc    5.830041e-01 1.284232e-01
-# lambda_jc   -4.550513e-01 1.171582e-01
-# lambda_jc   -1.630101e+00 2.638107e-01
-# lambda_jc   -2.320873e-01 1.368757e-01
-# lambda_jc   -6.054520e-01 1.465722e-01
-# lambda_jc    3.952548e-01 1.193807e-01
-# lambda_jc    5.471565e-01 1.326071e-01
-# lambda_jc    1.206255e+00 1.505518e-01
-# lambda_jc    7.487616e-01 1.870695e-01
-# lambda_jc   -1.464532e-06 3.723922e-01
-# lambda_jc    2.643586e-06 1.682354e-01
-# lambda_jc   -9.314455e-01 1.722523e-01
-# lambda_jc   -2.568843e-01 2.454712e-01
-# lambda_jc    6.442638e-07 1.594379e-01
-# Maximum gradient component: 0.0007915541
+TapeConfig(atomic = "enable") # set it back
