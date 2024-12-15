@@ -18,7 +18,7 @@ Enter a given chapter's folder (i.e., set the working directory or open a projec
 
 ## Run all RTMB models in the book (Linux)
 
-All working RTMB models can be executed by entering the ST_for_ecologists_RTMB folder and typing
+All working RTMB models can be executed by entering the spacetime-ecologists-RTMB folder and typing
 
 ```shell
 make -j 4 -l 2
