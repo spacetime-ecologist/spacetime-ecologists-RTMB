@@ -145,7 +145,8 @@ f <- function(par) {
     }
 
     M_gg <- function(v) { # built-in RTMB way to do uniformization
-        expAv(A = Mrate_gg, v = v, transpose = TRUE, Nmax = Nmax)
+        ## Set accuracy (tol) matching TMB
+        expAv(A = Mrate_gg, v = v, transpose = TRUE, Nmax = Nmax, tol=1e-5)
     }
 
     # project forward
@@ -167,8 +168,6 @@ f <- function(par) {
 
 f(par)
 
-TapeConfig(atomic = "disable")
 obj <- MakeADFun(f, par) # slow but works
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 opt # --> 161.4145 is book solution
-TapeConfig(atomic = "enable")

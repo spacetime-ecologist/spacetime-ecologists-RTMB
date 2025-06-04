@@ -176,11 +176,11 @@ f <- function(par) {
 }
 
 f(par)
-TapeConfig(atomic = "disable")
-TMB::config(tmbad.sparse_hessian_compress = TRUE)
+## Reduce memory caused by matrix multiply
+TapeConfig(matmul="compact")
 map <- list(ln_D = factor(NA))
 obj <- MakeADFun(f, par, random = c("beta_t", "ln_D_st"), map = map)
 
 image(obj$env$spHess(random = TRUE))
 
-# opt <- nlminb(obj$par, obj$fn, obj$gr) # --> book solves to 8833.474
+opt <- nlminb(obj$par, obj$fn, obj$gr) # --> book solves to 8833.474
