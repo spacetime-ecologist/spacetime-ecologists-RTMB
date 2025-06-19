@@ -1,6 +1,3 @@
-#
-# ! WARNING not yet working
-#
 
 library(terra)
 library(sf)
