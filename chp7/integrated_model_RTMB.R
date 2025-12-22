@@ -4,9 +4,6 @@ library(rnaturalearth)
 library(fmesher)
 library(terra)
 library(RTMB)
-# install RTMBconvenience for logspace_sub:
-# remotes::install_github("calbertsen/RTMBconvenience/RTMBconvenience")
-library(RTMBconvenience)
 
 #--------------------------------------------------------------------------------
 # read in data, manipulate for analysis

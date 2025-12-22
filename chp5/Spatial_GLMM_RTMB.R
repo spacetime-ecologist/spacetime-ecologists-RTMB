@@ -45,7 +45,6 @@ xy_i <- as.matrix(expand.grid(1:n_x, 1:n_y))[grid_i, ]
 conditional_dist_ll <- function(epsilon_xy, rho, sigma2, n_x, n_y) {
     # next line needed for just in time compiler nonsense
     # and needed to be within this function specifically
-    "[<-" <- ADoverload("[<-")
     Q_yy <- matrix(0, n_y, n_y)
     diag(Q_yy) <- 1 + rho^2
     for (y in 2:n_y) {
@@ -116,6 +115,7 @@ data <- list(
 
 f <- function(par) {
     getAll(data, par, warn = FALSE)
+    "[<-" <- ADoverload("[<-")
     jnll <- 0
     sig2 <- exp(log_sig2)
     rho <- 1 - plogis(logit_rho)

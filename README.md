@@ -18,21 +18,17 @@ Enter a given chapter's folder (i.e., set the working directory or open a projec
 
 ## Run all RTMB models in the book (Linux)
 
-All working RTMB models can be executed by entering the spacetime-ecologists-RTMB folder and typing
+All working models can be executed by entering the spacetime-ecologists-RTMB folder and typing
 
 ```shell
-make -j 4 -l 2
+make   
 ```
-Each RTMB model's fitted negative log likelihood can then be inspected via
+Each model's fitted negative log likelihood is stored and can be inspected via
 
 ```shell
 cat RTMB.res
 ```
-Note that all packages required to run the individual chapter scripts must be installed prior to using the `Makefile` 
-
-## Known issues
-
-- chapter 10 models do not yet work (in progress)
+Note that all packages required to run the individual chapter scripts must be installed prior to using the `Makefile`, which can be installed by sourcing the `install.R` file
 
 ## Funding acknowledgements
 
