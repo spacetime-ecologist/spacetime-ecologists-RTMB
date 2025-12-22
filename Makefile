@@ -7,7 +7,7 @@
 # define the directory as the current directory
 RTMBDIR := $(CURDIR)
 
-# find _RTMB.R files in the current directory, ignore ch 10 
+# find _RTMB.R files in the current directory 
 infiles := $(shell find $(RTMBDIR) -type f -name \*_RTMB.R \)
 
 outfiles := $(shell echo $(infiles) | sed s/_RTMB.R/_RTMB.chk/g)
