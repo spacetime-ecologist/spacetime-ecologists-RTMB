@@ -9,7 +9,7 @@ RTMBDIR := $(CURDIR)
 
 # find _RTMB.R files in the current directory, ignore ch 10 
 infiles := $(shell find $(RTMBDIR) -type f -name \*_RTMB.R \)
-# ! -path "$(RTMBDIR)/chp10/*")
+
 outfiles := $(shell echo $(infiles) | sed s/_RTMB.R/_RTMB.chk/g)
 
 .PHONY: all clean list res
